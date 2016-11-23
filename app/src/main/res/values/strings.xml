@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Sign In</string>
+
+    <string name="sign_out">Sign Out</string>
+    <string name="revoke_access">Revoke Access</string>
+    <string name="signing_in">Signing In</string>
+    <string name="unable_to_sign_in">Unable to Sign In</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="unable_to_sign_out">Unable to Sign Out</string>
+    <string name="access_revoked">Access Revoked</string>
+    <string name="unable_to_revoke_access">Unable to Revoke Access</string>
+
+</resources>
