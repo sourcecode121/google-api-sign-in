@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -14,6 +15,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -25,6 +27,9 @@ public class MainActivity extends AppCompatActivity
     private static final int SIGN_IN_REQUEST = 123;
 
     private TextView details;
+    private SignInButton signInButton;
+    private Button signOutButton;
+    private Button revokeButton;
     private GoogleApiClient googleApiClient;
 
     @Override
@@ -33,19 +38,21 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         details = (TextView) findViewById(R.id.details);
+        signInButton = (SignInButton) findViewById(R.id.signin_button);
+        signOutButton = (Button) findViewById(R.id.signout_button);
+        revokeButton = (Button) findViewById(R.id.revoke_access_button);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                                                         .requestEmail()
                                                         .build();
 
         googleApiClient = new GoogleApiClient.Builder(this)
+                                            .enableAutoManage(this, this)
                                             .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                                            .addConnectionCallbacks(this)
-                                            .addOnConnectionFailedListener(this)
                                             .build();
 
         // Sign In using an intent
-        findViewById(R.id.signin_button).setOnClickListener(new View.OnClickListener() {
+        signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (googleApiClient.isConnected()) {
@@ -57,7 +64,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         // Sign Out
-        findViewById(R.id.signout_button).setOnClickListener(new View.OnClickListener() {
+        signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (googleApiClient.isConnected()) {
@@ -66,6 +73,7 @@ public class MainActivity extends AppCompatActivity
                         public void onResult(@NonNull Status status) {
                             if (status.isSuccess()) {
                                 details.setText(R.string.signed_out);
+                                updateButtons(false);
                             }
                             else {
                                 details.setText(R.string.unable_to_sign_out);
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         // Revoke Access
-        findViewById(R.id.revoke_access_button).setOnClickListener(new View.OnClickListener() {
+        revokeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (googleApiClient.isConnected()) {
@@ -86,6 +94,7 @@ public class MainActivity extends AppCompatActivity
                         public void onResult(@NonNull Status status) {
                             if (status.isSuccess()) {
                                 details.setText(R.string.access_revoked);
+                                updateButtons(false);
                             }
                             else {
                                 details.setText(R.string.unable_to_revoke_access);
@@ -143,9 +152,23 @@ public class MainActivity extends AppCompatActivity
         if (result.isSuccess()) {
             GoogleSignInAccount account = result.getSignInAccount();
             details.setText(account.getEmail());
+            updateButtons(true);
         }
         else {
             details.setText(R.string.unable_to_sign_in);
+        }
+    }
+
+    private void updateButtons(boolean b) {
+        if (b) {
+            signInButton.setEnabled(false);
+            signOutButton.setEnabled(true);
+            revokeButton.setEnabled(true);
+        }
+        else {
+            signInButton.setEnabled(true);
+            signOutButton.setEnabled(false);
+            revokeButton.setEnabled(false);
         }
     }
 }
